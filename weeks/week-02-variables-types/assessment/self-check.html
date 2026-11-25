@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tự kiểm tra — Tuần 02 Python</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+      color: #172033;
+      background: #f5f7fa;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --blue: #3157a4;
+      --line: #e1e6ee;
+      --muted: #667085;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.6; background: linear-gradient(180deg, #eef2f7 0, #f7f8fa 520px); }
+    main { width: min(850px, calc(100% - 32px)); margin: 42px auto 64px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(26px, 5vw, 42px);
+      color: white;
+      background: linear-gradient(120deg, #172b4d, #244b7a 72%, #286b79);
+      border: 1px solid #18385b;
+      border-radius: 17px;
+      box-shadow: 0 14px 32px #182d471c;
+    }
+    .hero::after { content: "{ }"; position: absolute; right: 28px; bottom: -42px; color: #ffffff12; font: 800 150px/1 ui-monospace, monospace; letter-spacing: -.15em; transform: rotate(-8deg); }
+    .eyebrow { display: inline-block; padding: 5px 10px; color: #e4ebf4; background: #ffffff12; border: 1px solid #ffffff24; border-radius: 99px; font-size: .75rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    .eyebrow.dark { color: #3157a4; background: #eaf0fa; border-color: #dce5f2; }
+    h1 { position: relative; z-index: 1; margin: 14px 0 4px; font-size: clamp(1.8rem, 5vw, 2.65rem); line-height: 1.15; letter-spacing: -.04em; }
+    .hero p { position: relative; z-index: 1; max-width: 590px; margin: 10px 0 0; color: #d6e0ed; }
+    .hero-note { position: relative; z-index: 1; display: flex; align-items: flex-start; gap: 11px; max-width: 650px; margin-top: 18px; padding: 12px 14px; color: #f2f5fa; background: #ffffff12; border: 1px solid #ffffff2a; border-radius: 10px; }
+    .hero-note-icon { display: grid; place-items: center; width: 23px; height: 23px; flex: 0 0 auto; color: #172b4d; background: #f2c879; border-radius: 50%; font-size: .8rem; font-weight: 900; }
+    .hero-note strong { display: block; margin: 0 0 2px; color: #ffe3a2; font-size: .82rem; }
+    .hero-note p { max-width: none; margin: 0; color: #e1e8f1; font-size: .86rem; line-height: 1.5; }
+    .hero-note code { color: #fff1cc; background: #ffffff18; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 21px; position: relative; z-index: 1; }
+    .meta span { padding: 6px 10px; border: 1px solid #ffffff1c; border-radius: 7px; background: #ffffff0c; color: #e6edf5; font-size: .82rem; }
+    .quiz-top { display: flex; align-items: center; gap: 14px; margin: 18px 0 24px; padding: 12px 16px; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 3px 10px #182d4708; }
+    .progress-copy { flex: 0 0 auto; font-size: .9rem; font-weight: 700; }
+    .progress-track { height: 7px; flex: 1; overflow: hidden; background: #edf0f4; border-radius: 99px; }
+    .progress-fill { width: 0; height: 100%; background: linear-gradient(90deg, #3157a4, #3a8a87); border-radius: inherit; transition: width .25s ease; }
+    .question-nav-panel { margin: 18px 0 24px; padding: 16px 18px; background: #fff; border: 1px solid var(--line); border-radius: 11px; box-shadow: 0 3px 10px #182d4707; }
+    .question-nav-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+    .question-nav-head strong { color: #26364a; font-size: .93rem; }
+    .question-nav-head span { color: var(--muted); font-size: .82rem; }
+    .question-nav { display: grid; grid-template-columns: repeat(12, minmax(28px, 1fr)); gap: 7px; }
+    .question-jump { min-width: 0; padding: 6px 2px; color: #475467; background: #f7f9fb; border: 1px solid #e5e9ef; border-radius: 7px; font-size: .78rem; font-weight: 700; }
+    .question-jump:hover { color: #244b7a; background: #edf3f8; border-color: #bacadd; }
+    .question-jump.answered { color: #fff; background: #3157a4; border-color: #3157a4; }
+    .question-jump.active { outline: 2px solid #3a8a87; outline-offset: 2px; }
+    .nav-legend { display: inline-block; width: 9px; height: 9px; background: #f7f9fb; border: 1px solid #e5e9ef; border-radius: 3px; vertical-align: 1px; }
+    .nav-legend.answered-key { background: #3157a4; border-color: #3157a4; }
+    form { margin-top: 20px; }
+    fieldset, .result { min-width: 0; margin: 12px 0; padding: 17px 19px; background: #fff; border: 1px solid var(--line); border-radius: 11px; box-shadow: 0 3px 10px #182d4707; scroll-margin-top: 20px; }
+    form { counter-reset: question; }
+    fieldset { counter-increment: question; transition: border-color .18s, box-shadow .18s; }
+    fieldset:hover { border-color: #d1d9e4; }
+    fieldset:focus-within { border-color: #9db2d2; box-shadow: 0 0 0 3px #3157a40d; }
+    legend { display: block; float: left; width: 100%; max-width: 100%; margin: 0 0 10px; padding: 0; font-weight: 700; font-size: 1rem; line-height: 1.5; }
+    legend::before { content: counter(question, decimal-leading-zero); display: inline-grid; place-items: center; width: 29px; height: 29px; margin-right: 10px; color: #3157a4; background: #edf2f8; border-radius: 8px; font-size: .73rem; letter-spacing: .02em; vertical-align: middle; }
+    fieldset::after { content: ""; display: block; clear: both; }
+    label { display: flex; align-items: center; gap: 10px; margin: 5px 0; padding: 8px 11px; background: #fbfcfd; border: 1px solid #edf0f3; border-radius: 7px; cursor: pointer; transition: background-color .15s ease, border-color .15s ease; }
+    label:hover { background: #f5f8fb; border-color: #d8e1ec; }
+    label:has(input:checked) { color: #244b7a; background: #f0f5fa; border-color: #adc1d7; }
+    label:has(input:checked)::after { content: "✓"; margin-left: auto; color: #3157a4; font-size: .88rem; font-weight: 800; }
+    input { flex: 0 0 auto; width: 17px; height: 17px; margin: 3px 0 0; accent-color: var(--blue); }
+    code { padding: 2px 6px; color: #294e78; background: #edf2f7; border-radius: 4px; font-size: .92em; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 30px; }
+    button { border: 0; border-radius: 10px; padding: 12px 20px; font: inherit; font-weight: 700; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    button:hover { transform: translateY(-1px); }
+    button:focus-visible, input:focus-visible { outline: 3px solid #f3a712; outline-offset: 3px; }
+    button[type="submit"] { padding: 13px 21px; color: white; background: #244b7a; box-shadow: 0 5px 12px #244b7a26; }
+    button[type="submit"]:hover { background: #193b65; }
+    button:disabled { opacity: .65; cursor: wait; transform: none; }
+    button[type="reset"] { color: #3d4961; background: #e9edf4; }
+    .result { display: none; padding: 22px; border-color: #dce4f5; }
+    .result.show { display: block; animation: pop-in .28s ease-out; }
+    .result h2 { margin: 0 0 14px; font-size: 1.25rem; }
+    .score { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -.04em; }
+    .good { color: #16804a; }
+    .retry { color: #bd4b32; }
+    .answer { padding: 11px 14px; margin: 9px 0; color: #44516a; background: #f7f8fb; border: 1px solid #e8ebf2; border-left: 4px solid #c4cede; border-radius: 9px; }
+    .answer.correct { border-left-color: #23834c; background: #f1faf4; }
+    .answer.incorrect { border-left-color: #c44232; background: #fff6f3; }
+    .muted { color: var(--muted); font-size: .92rem; }
+    footer { margin: 22px 0; text-align: center; }
+    .task-box { margin: 14px 0; padding: 13px 15px; color: #344054; background: #f7f9fb; border: 1px solid #e9edf2; border-left: 3px solid #5279a8; border-radius: 7px; }
+    .editor-label { display: block; margin: 16px 0 7px; font-size: .9rem; font-weight: 700; }
+    #code-status { min-height: 1.5em; margin: 14px 0 8px; color: var(--muted); font-size: .92rem; }
+    #code-status.pass { color: #16804a; font-weight: 700; }
+    #code-status.fail { color: #bd4b32; font-weight: 650; }
+    .coding-question { margin: 15px 0; padding: 16px; background: #fbfcfd; border: 1px solid #e5e9ef; border-radius: 9px; }
+    .coding-question h3 { margin: 0 0 8px; color: #26364a; font-size: .98rem; }
+    .coding-title { display: block; margin: 0 0 7px; color: #3157a4; font-size: .9rem; }
+    .exercise-part { min-width: 0; margin: 19px 0; padding: 20px 21px; background: #fff; border: 1px solid var(--line); border-top: 3px solid #3157a4; border-radius: 12px; box-shadow: 0 5px 16px #182d4709; }
+    .exercise-part:nth-of-type(2) { border-top-color: #3157a4; }
+    .exercise-part:nth-of-type(3) { border-top-color: #36827e; }
+    .exercise-part:nth-of-type(4) { border-top-color: #bd8750; }
+    .exercise-part-heading { display: flex; align-items: center; gap: 13px; padding: 0 0 16px; border-bottom: 1px solid #edf0f4; }
+    .part-number { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 auto; color: #244b7a; background: #edf3f8; border: 1px solid #dfe8f1; border-radius: 11px; font-size: .82rem; font-weight: 800; }
+    .exercise-part:nth-of-type(3) .part-number { color: #266762; background: #edf7f5; border-color: #d8ebe7; }
+    .exercise-part:nth-of-type(4) .part-number { color: #8a5b2c; background: #fbf4eb; border-color: #f0e4d3; }
+    .exercise-part-heading h3 { margin: 0; color: #26364a; font-size: 1rem; }
+    .exercise-part-heading p { margin: 2px 0 0; color: var(--muted); font-size: .83rem; }
+    .part-label { display: flex; align-items: center; gap: 10px; margin: 18px 0 9px; color: #667085; font-size: .73rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .part-label::after { height: 1px; flex: 1; content: ""; background: #e9edf2; }
+    .exercise-part .coding-question { margin: 13px 0 0; }
+    .coding-question .task-box { margin: 8px 0 12px; }
+    .coding-editor { display: block; width: 100%; min-height: 145px; resize: vertical; padding: 14px; color: #e8edf4; background: #1d2939; border: 1px solid #344054; border-radius: 8px; font: 14px/1.65 "Cascadia Code", Consolas, monospace; tab-size: 4; }
+    .coding-editor:focus-visible { outline: 3px solid #91aac8; outline-offset: 2px; }
+    .code-feedback { display: none; margin: 10px 0 0; padding: 9px 11px; border-radius: 8px; font-size: .9rem; }
+    .code-feedback.show { display: block; }
+    .code-feedback.pass { color: #146c3a; background: #eef9f1; }
+    .code-feedback.fail { color: #9d3e2b; background: #fff3ef; }
+    .score-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+    .score-card { display: grid; gap: 4px; padding: 15px; background: #f8fafc; border: 1px solid #e6eaf0; border-radius: 9px; }
+    .score-card span { color: var(--muted); font-size: .86rem; }
+    .score-card .score { font-size: 1.45rem; }
+    .score-card.total { background: #edf3f8; border-color: #d7e2ed; }
+    .result h2 { color: #26364a; }
+    #summary { color: #475467; }
+    #code-status { padding: 9px 11px; background: #f7f9fb; border-radius: 7px; }
+    #code-status.pass { background: #eff8f2; }
+    #code-status.fail { background: #fff4f1; }
+    @keyframes pop-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 560px) {
+      main { width: min(100% - 22px, 820px); margin: 18px auto; }
+      .hero { border-radius: 14px; }
+      .hero::after { right: 10px; font-size: 130px; }
+      .quiz-top { margin-bottom: 18px; }
+      .question-nav { grid-template-columns: repeat(8, minmax(28px, 1fr)); gap: 6px; }
+      .question-nav-panel { padding: 14px; }
+      fieldset { padding: 17px 15px; }
+      .actions button { flex: 1; }
+      .score-grid { grid-template-columns: 1fr; }
+      .exercise-part { padding: 16px 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <span class="eyebrow">Python Journey · Tuần 02</span>
+      <h1>Biến &amp; kiểu dữ liệu</h1>
+      <p>Bài tự chấm gồm trắc nghiệm và tự luận bằng Python. Hoàn thành cả hai phần rồi nộp một lần để xem điểm từng phần.</p>
+      <aside class="hero-note" role="note" aria-label="Lưu ý khi làm bài">
+        <span class="hero-note-icon" aria-hidden="true">!</span>
+        <div><strong>Lưu ý</strong><p>Điền code ở cả ba mục rồi bấm “Nộp bài &amp; xem điểm”. Cần internet để tải môi trường Python lần đầu; các bài dùng <code>input()</code> sẽ được chấm với dữ liệu mẫu.</p></div>
+      </aside>
+      <div class="meta"><span>✦ 24 trắc nghiệm · 8 mỗi phần</span><span>⌘ 3 phần code ngẫu nhiên</span><span>◎ Tổng 10 điểm</span></div>
+    </header>
+
+    <div class="quiz-top" aria-label="Tiến độ làm bài">
+      <span class="progress-copy" id="progress-copy">Đã trả lời 0/24</span>
+      <div class="progress-track" role="progressbar" aria-label="Tiến độ trả lời trắc nghiệm" aria-valuemin="0" aria-valuemax="24" aria-valuenow="0">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <form id="quiz">
+      <section class="question-nav-panel" aria-label="Điều hướng câu hỏi">
+        <div class="question-nav-head"><strong>Đi đến câu hỏi</strong><span><span class="nav-legend answered-key"></span> Đã chọn · <span class="nav-legend"></span> Chưa chọn</span></div>
+        <div id="question-nav" class="question-nav"></div>
+      </section>
+      <section class="exercise-part" aria-labelledby="exercise-01-title">
+        <div class="exercise-part-heading"><span class="part-number">01</span><div><h3 id="exercise-01-title">Bài 01 · Biến trong Python</h3><p>Biến, kiểu dữ liệu và cách trình bày giá trị</p></div></div>
+        <h4 class="part-label">Trắc nghiệm</h4>
+        <fieldset data-answer="c" data-explanation="Dùng == để so sánh hai giá trị. Dấu = gán giá trị cho biến.">
+          <legend>Toán tử nào kiểm tra hai giá trị bằng nhau?</legend>
+          <label><input type="radio" name="q5" value="a"> =</label><label><input type="radio" name="q5" value="b"> :=</label><label><input type="radio" name="q5" value="c"> ==</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Phép chia thông thường / luôn trả về float, vì vậy 10 / 2 có kiểu float.">
+          <legend>Kiểu dữ liệu của kết quả <code>10 / 2</code> là gì?</legend>
+          <label><input type="radio" name="q6" value="a"> float</label><label><input type="radio" name="q6" value="b"> int</label><label><input type="radio" name="q6" value="c"> str</label>
+        </fieldset>
+        <fieldset data-answer="c" data-explanation="f-string đặt tên biến trong dấu ngoặc nhọn và tự chèn giá trị của biến vào chuỗi.">
+          <legend>Cách nào chèn giá trị biến <code>ten</code> vào lời chào?</legend>
+          <label><input type="radio" name="q8" value="a"> <code>"Xin chào {ten}"</code></label><label><input type="radio" name="q8" value="b"> <code>"Xin chào " + ten</code> trong mọi trường hợp</label><label><input type="radio" name="q8" value="c"> <code>f"Xin chào {ten}"</code></label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Phép chia lấy nguyên // bỏ phần thập phân: 17 // 5 bằng 3.">
+          <legend>Kết quả của <code>17 // 5</code> là gì?</legend>
+          <label><input type="radio" name="q9" value="a"> 3</label><label><input type="radio" name="q9" value="b"> 3.4</label><label><input type="radio" name="q9" value="c"> 2</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Python khuyến khích snake_case: chữ thường, các từ cách nhau bằng dấu gạch dưới.">
+          <legend>Tên biến nào theo kiểu snake_case?</legend>
+          <label><input type="radio" name="q11" value="a"> tenNguoiDung</label><label><input type="radio" name="q11" value="b"> ten_nguoi_dung</label><label><input type="radio" name="q11" value="c"> Ten-Nguoi-Dung</label>
+        </fieldset>
+        <fieldset data-answer="c" data-explanation="Giá trị 8.5 được viết trong dấu nháy nên là chuỗi (str), không phải float.">
+          <legend>Kiểu dữ liệu của <code>"8.5"</code> là gì?</legend>
+          <label><input type="radio" name="q12" value="a"> float</label><label><input type="radio" name="q12" value="b"> int</label><label><input type="radio" name="q12" value="c"> str</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Multiple assignment cho phép gán nhiều biến trên một dòng theo thứ tự tương ứng.">
+          <legend>Cách nào gán ba giá trị lần lượt cho <code>ho</code>, <code>ten</code>, <code>tuoi</code>?</legend>
+          <label><input type="radio" name="q13" value="a"> <code>ho, ten, tuoi = "Nguyễn", "An", 18</code></label><label><input type="radio" name="q13" value="b"> <code>ho = ten = tuoi = "Nguyễn", "An", 18</code></label><label><input type="radio" name="q13" value="c"> <code>ho, ten, tuoi == "Nguyễn", "An", 18</code></label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Phép gán tăng cường x += 5 tương đương x = x + 5, nên x trở thành 105.">
+          <legend>Nếu <code>x = 100</code>, sau <code>x += 5</code>, x bằng bao nhiêu?</legend>
+          <label><input type="radio" name="q14" value="a"> 100</label><label><input type="radio" name="q14" value="b"> 105</label><label><input type="radio" name="q14" value="c"> 5</label>
+        </fieldset>
+        <h4 class="part-label">Tự nhập code · câu ngẫu nhiên</h4>
+        <div id="answers-ex01"></div>
+      </section>
+
+      <section class="exercise-part" aria-labelledby="exercise-02-title">
+        <div class="exercise-part-heading"><span class="part-number">02</span><div><h3 id="exercise-02-title">Bài 02 · Chuyển đổi kiểu dữ liệu</h3><p>int(), float(), bool(), BMI và đổi đơn vị</p></div></div>
+        <h4 class="part-label">Trắc nghiệm</h4>
+        <fieldset data-answer="c" data-explanation="int(3.9) cắt phần thập phân chứ không làm tròn, nên kết quả là 3.">
+          <legend>Kết quả của <code>int(3.9)</code> là gì?</legend>
+          <label><input type="radio" name="q2" value="a"> 4</label><label><input type="radio" name="q2" value="b"> 3.9</label><label><input type="radio" name="q2" value="c"> 3</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Hai chuỗi được nối thành chuỗi '123'. Muốn cộng số học, hãy chuyển chúng sang kiểu số.">
+          <legend>Biểu thức <code>"12" + "3"</code> cho kết quả nào?</legend>
+          <label><input type="radio" name="q3" value="a"> Chuỗi "123"</label><label><input type="radio" name="q3" value="b"> Số 15</label><label><input type="radio" name="q3" value="c"> Lỗi kiểu dữ liệu</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Chuỗi rỗng là falsy nên bool("") trả về False.">
+          <legend>Kết quả của <code>bool("")</code> là gì?</legend>
+          <label><input type="radio" name="q4" value="a"> True</label><label><input type="radio" name="q4" value="b"> False</label><label><input type="radio" name="q4" value="c"> Lỗi</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="int('ba') không chuyển được chữ không phải số thành số nguyên nên Python báo ValueError.">
+          <legend>Điều gì xảy ra khi chạy <code>int("ba")</code>?</legend>
+          <label><input type="radio" name="q7" value="a"> Kết quả là 0</label><label><input type="radio" name="q7" value="b"> Python báo ValueError</label><label><input type="radio" name="q7" value="c"> Kết quả là chuỗi "ba"</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Chuỗi 'False' có nội dung nên bool('False') là True. bool() không phân tích chữ False thành giá trị boolean.">
+          <legend>Kết quả của <code>bool("False")</code> là gì?</legend>
+          <label><input type="radio" name="q15" value="a"> True</label><label><input type="radio" name="q15" value="b"> False</label><label><input type="radio" name="q15" value="c"> ValueError</label>
+        </fieldset>
+        <fieldset data-answer="c" data-explanation="float() chuyển chuỗi số thập phân thành một giá trị float.">
+          <legend>Kết quả của <code>float("3.14")</code> có kiểu gì?</legend>
+          <label><input type="radio" name="q16" value="a"> str</label><label><input type="radio" name="q16" value="b"> int</label><label><input type="radio" name="q16" value="c"> float</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Danh sách rỗng không có phần tử nên bool([]) trả về False.">
+          <legend>Kết quả của <code>bool([])</code> là gì?</legend>
+          <label><input type="radio" name="q17" value="a"> True</label><label><input type="radio" name="q17" value="b"> False</label><label><input type="radio" name="q17" value="c"> Lỗi</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="int() chuyển float thành số nguyên bằng cách cắt phần thập phân, không làm tròn.">
+          <legend>Kết quả của <code>int(7.8)</code> là gì?</legend>
+          <label><input type="radio" name="q18" value="a"> 7</label><label><input type="radio" name="q18" value="b"> 8</label><label><input type="radio" name="q18" value="c"> 7.8</label>
+        </fieldset>
+        <h4 class="part-label">Tự nhập code · câu ngẫu nhiên</h4>
+        <div id="answers-ex02"></div>
+      </section>
+
+      <section class="exercise-part" aria-labelledby="exercise-03-title">
+        <div class="exercise-part-heading"><span class="part-number">03</span><div><h3 id="exercise-03-title">Bài 03 · Máy tính nhận input</h3><p>Nhập dữ liệu, chuyển kiểu và tính toán</p></div></div>
+        <h4 class="part-label">Trắc nghiệm</h4>
+        <fieldset data-answer="b" data-explanation="input() luôn trả về str, kể cả khi người dùng gõ chữ số.">
+          <legend>Giá trị nhận từ <code>input()</code> có kiểu gì?</legend>
+          <label><input type="radio" name="q1" value="a"> int</label><label><input type="radio" name="q1" value="b"> str</label><label><input type="radio" name="q1" value="c"> Kiểu phụ thuộc vào nội dung nhập</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Trước khi tính với giá trị input(), hãy chuyển chuỗi sang int hoặc float tùy dữ liệu.">
+          <legend>Muốn tính với tuổi nhận từ <code>input()</code>, cần làm gì?</legend>
+          <label><input type="radio" name="q10" value="a"> Giữ nguyên vì input() tự nhận ra số</label><label><input type="radio" name="q10" value="b"> Chuyển sang kiểu số bằng int() hoặc float()</label><label><input type="radio" name="q10" value="c"> Chuyển sang bool()</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Muốn tính số thập phân nhập từ input(), chuyển chuỗi thành float trước khi tính.">
+          <legend>Cách nào chuyển dữ liệu người dùng nhập thành số thực?</legend>
+          <label><input type="radio" name="q19" value="a"> <code>float(input(...))</code></label><label><input type="radio" name="q19" value="b"> <code>str(input(...))</code></label><label><input type="radio" name="q19" value="c"> <code>type(input(...))</code></label>
+        </fieldset>
+        <fieldset data-answer="c" data-explanation="Với dữ liệu mẫu 8 và 2, tổng của hai số là 10.0 khi chúng được chuyển thành float.">
+          <legend>Máy tính nhập hai số 8 và 2 dưới dạng float. Tổng là bao nhiêu?</legend>
+          <label><input type="radio" name="q20" value="a"> 82</label><label><input type="radio" name="q20" value="b"> 6.0</label><label><input type="radio" name="q20" value="c"> 10.0</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Diện tích hình tròn bằng pi nhân bán kính bình phương: 3.14159 × 2² = 12.56636.">
+          <legend>Với pi = 3.14159 và bán kính 2, diện tích hình tròn là bao nhiêu?</legend>
+          <label><input type="radio" name="q21" value="a"> 6.28318</label><label><input type="radio" name="q21" value="b"> 12.56636</label><label><input type="radio" name="q21" value="c"> 4</label>
+        </fieldset>
+        <fieldset data-answer="a" data-explanation="Giảm 20% nghĩa là trả 80% giá ban đầu: 500000 × 0.8 = 400000.">
+          <legend>Giá 500000 giảm 20% còn bao nhiêu?</legend>
+          <label><input type="radio" name="q22" value="a"> 400000</label><label><input type="radio" name="q22" value="b"> 100000</label><label><input type="radio" name="q22" value="c"> 480000</label>
+        </fieldset>
+        <fieldset data-answer="c" data-explanation="Đổi VND sang USD bằng cách chia số tiền VND cho tỷ giá VND/USD: 50000000 ÷ 25000 = 2000.">
+          <legend>50000000 VND đổi theo tỷ giá 25000 VND/USD bằng bao nhiêu USD?</legend>
+          <label><input type="radio" name="q23" value="a"> 1250000000000 USD</label><label><input type="radio" name="q23" value="b"> 25000 USD</label><label><input type="radio" name="q23" value="c"> 2000 USD</label>
+        </fieldset>
+        <fieldset data-answer="b" data-explanation="Phép chia thông thường / cho kết quả float, kể cả khi hai toán hạng là số nguyên.">
+          <legend>Kiểu kết quả của phép tính <code>5 / 2</code> là gì?</legend>
+          <label><input type="radio" name="q24" value="a"> int</label><label><input type="radio" name="q24" value="b"> float</label><label><input type="radio" name="q24" value="c"> str</label>
+        </fieldset>
+        <h4 class="part-label">Tự nhập code · câu ngẫu nhiên</h4>
+        <div id="answers-ex03"></div>
+      </section>
+
+      <p id="code-status" class="muted" aria-live="polite">Code sẽ chạy trong trình duyệt khi bạn nộp bài. Lần đầu cần internet để tải môi trường Python.</p>
+      <div class="actions"><button id="grade-all" type="submit">Nộp bài &amp; xem điểm&nbsp; →</button></div>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" tabindex="-1">
+      <h2>Kết quả bài làm</h2>
+      <div class="score-grid">
+        <div class="score-card"><span>Phần trắc nghiệm</span><strong id="quiz-score" class="score"></strong></div>
+        <div class="score-card"><span>Phần tự luận</span><strong id="coding-score" class="score"></strong></div>
+        <div class="score-card total"><span>Tổng điểm</span><strong id="total-score" class="score"></strong></div>
+      </div>
+      <p id="summary"></p>
+      <div id="feedback"></div>
+      <p class="muted">Đây là bài tự ôn, không thay thế bài tập, mini-project hay checker dành cho sinh viên trong STUDENT-GUIDE.md.</p>
+    </section>
+    <footer class="muted">Cứ thử lại sau khi xem giải thích — học bằng cách tự chạy code nhé 🐍</footer>
+  </main>
+  <script>
+    const quiz = document.querySelector("#quiz");
+    const result = document.querySelector("#result");
+    const quizScoreOutput = document.querySelector("#quiz-score");
+    const codingScoreOutput = document.querySelector("#coding-score");
+    const totalScoreOutput = document.querySelector("#total-score");
+    const summary = document.querySelector("#summary");
+    const feedback = document.querySelector("#feedback");
+    const progressCopy = document.querySelector("#progress-copy");
+    const progressFill = document.querySelector("#progress-fill");
+    const progressBar = document.querySelector('[role="progressbar"]');
+    const totalQuestions = quiz.querySelectorAll("fieldset").length;
+    const questionNav = document.querySelector("#question-nav");
+    const quizQuestions = [...quiz.querySelectorAll("fieldset")];
+    quizQuestions.forEach((question, index) => {
+      const jumpButton = document.createElement("button");
+      jumpButton.type = "button";
+      jumpButton.className = "question-jump";
+      jumpButton.textContent = String(index + 1).padStart(2, "0");
+      jumpButton.setAttribute("aria-label", `Đi đến câu ${index + 1}`);
+      jumpButton.setAttribute("aria-pressed", "false");
+      jumpButton.addEventListener("click", () => {
+        question.scrollIntoView({ behavior: "smooth", block: "center" });
+        question.querySelector("input").focus({ preventScroll: true });
+        questionNav.querySelectorAll(".question-jump").forEach((button) => button.classList.remove("active"));
+        jumpButton.classList.add("active");
+      });
+      questionNav.append(jumpButton);
+    });
+    const codeStatus = document.querySelector("#code-status");
+    const codingQuestions = quiz;
+    const gradeButton = document.querySelector("#grade-all");
+    let pyodidePromise;
+
+    const challenges = {
+      profile: {
+        part: "ex01",
+        name: "Bài 01 · Biến và kiểu dữ liệu",
+        prompt: "Tạo ten = 'Linh', tuoi = 19, diem_tb = 8.5, dang_hoc = True. In giá trị và type() của từng biến, mỗi biến một dòng.",
+        check: "student_namespace.get('ten') == 'Linh' and type(student_namespace.get('tuoi')) is int and type(student_namespace.get('diem_tb')) is float and type(student_namespace.get('dang_hoc')) is bool",
+        output: "Linh <class 'str'>\\n19 <class 'int'>\\n8.5 <class 'float'>\\nTrue <class 'bool'>"
+      },
+      swap: {
+        part: "ex01",
+        name: "Bài 01 · Hoán đổi biến",
+        prompt: "Cho a = 10 và b = 20. Hoán đổi giá trị không dùng biến tạm rồi in a và b trên cùng một dòng: 20 10.",
+        check: "student_namespace.get('a') == 20 and student_namespace.get('b') == 10",
+        output: "20 10"
+      },
+      augmented: {
+        part: "ex01",
+        name: "Bài 01 · Gán tăng cường",
+        prompt: "Bắt đầu x = 100. Dùng lần lượt += 20, -= 10, *= 2, //= 5; in x sau mỗi bước. Kết quả lần lượt: 120, 110, 220, 44.",
+        check: "student_namespace.get('x') == 44",
+        output: "120\\n110\\n220\\n44"
+      },
+      multiple: {
+        part: "ex01",
+        name: "Bài 01 · Multiple assignment",
+        prompt: "Gán ho, ten, tuoi trên cùng một dòng với giá trị 'Nguyễn', 'An', 18 rồi in theo mẫu: Họ tên: Nguyễn An, 18 tuổi.",
+        check: "student_namespace.get('ho') == 'Nguyễn' and student_namespace.get('ten') == 'An' and student_namespace.get('tuoi') == 18",
+        output: "Họ tên: Nguyễn An, 18 tuổi"
+      },
+      convert: {
+        part: "ex02",
+        name: "Bài 02 · Chuyển chuỗi thành số",
+        prompt: 'Cho so_text = "42", chuyển thành int, cộng thêm 8, lưu vào ket_qua và in kết quả 50.',
+        check: "student_namespace.get('so_text') == '42' and type(student_namespace.get('so')) is int and student_namespace.get('so') == 42 and student_namespace.get('ket_qua') == 50",
+        output: "50"
+      },
+      pi: {
+        part: "ex02",
+        name: "Bài 02 · Chuyển float sang int",
+        prompt: "Cho pi = 3.14159. Chuyển pi sang int, lưu vào pi_nguyen rồi in kết quả 3.",
+        check: "student_namespace.get('pi') == 3.14159 and type(student_namespace.get('pi_nguyen')) is int and student_namespace.get('pi_nguyen') == 3",
+        output: "3"
+      },
+      bool: {
+        part: "ex02",
+        name: "Bài 02 · Kiểm tra bool()",
+        prompt: 'In kết quả của bool(0), bool(1), bool(""), bool("hello"), bool([]), bool([1, 2]), mỗi kết quả một dòng.',
+        check: "True",
+        output: "False\\nTrue\\nFalse\\nTrue\\nFalse\\nTrue"
+      },
+      bmi: {
+        part: "ex02",
+        name: "Bài 02 · Tính BMI",
+        prompt: "Dùng input() nhập chiều cao rồi cân nặng. Với dữ liệu mẫu 1.75 m và 70 kg, tính BMI, lưu vào biến bmi và in một chữ số thập phân: 22.9.",
+        inputs: ["1.75", "70"],
+        check: "abs(student_namespace.get('bmi', 0) - (70 / 1.75**2)) < 0.000001",
+        output: "22.9"
+      },
+      seconds: {
+        part: "ex02",
+        name: "Bài 02 · Đổi giây thành giờ, phút, giây",
+        prompt: "Dùng input() nhập số giây. Với dữ liệu mẫu 3661, tách thành gio, phut, giay_con_lai rồi in: 1 giờ 1 phút 1 giây.",
+        inputs: ["3661"],
+        check: "student_namespace.get('gio') == 1 and student_namespace.get('phut') == 1 and student_namespace.get('giay_con_lai') == 1",
+        output: "1 giờ 1 phút 1 giây"
+      },
+      calculator: {
+        part: "ex03",
+        name: "Bài 03 · Máy tính hai số",
+        prompt: "Dùng input() nhập hai số vào so_1 và so_2. Dữ liệu mẫu là 8 và 2. In tổng, hiệu, tích, thương, mỗi phép tính một dòng theo mẫu: Tổng: 10.0; Hiệu: 6.0; Tích: 16.0; Thương: 4.0.",
+        inputs: ["8", "2"],
+        check: "student_namespace.get('so_1') == 8 and student_namespace.get('so_2') == 2",
+        output: "Tổng: 10.0\\nHiệu: 6.0\\nTích: 16.0\\nThương: 4.0"
+      },
+      circle: {
+        part: "ex03",
+        name: "Bài 03 · Diện tích và chu vi hình tròn",
+        prompt: "Dùng input() nhập ban_kinh (dữ liệu mẫu 2). Dùng pi = 3.14159, lưu diện tích vào dien_tich và chu vi vào chu_vi, rồi in mỗi kết quả với 2 chữ số thập phân.",
+        inputs: ["2"],
+        check: "student_namespace.get('pi') == 3.14159 and abs(student_namespace.get('dien_tich', 0) - 3.14159 * 4) < 0.000001 and abs(student_namespace.get('chu_vi', 0) - 12.56636) < 0.000001",
+        output: "Diện tích: 12.57\\nChu vi: 12.57"
+      },
+      discount: {
+        part: "ex03",
+        name: "Bài 03 · Tính giá sau giảm",
+        prompt: "Dùng input() nhập giá gốc và phần trăm giảm. Dữ liệu mẫu là 500000 và 20. Tính giá sau giảm, lưu vào gia_sau_giam rồi in 400000.",
+        inputs: ["500000", "20"],
+        check: "abs(student_namespace.get('gia_sau_giam', 0) - 400000) < 0.001",
+        output: "400000"
+      },
+      currency: {
+        part: "ex03",
+        name: "Bài 03 · Đổi VND sang USD",
+        prompt: "Dùng input() nhập số tiền VND vào so_tien_vnd và tỷ giá vào ty_gia. Dữ liệu mẫu là 50000000 và 25000. Tính so_tien_usd rồi in với 2 chữ số thập phân: 2000.00.",
+        inputs: ["50000000", "25000"],
+        check: "abs(student_namespace.get('so_tien_usd', 0) - 2000) < 0.001",
+        output: "2000.00"
+      },
+      float: {
+        part: "ex02",
+        name: "Ôn thêm · Chuyển sang số thực",
+        prompt: 'Tạo gia_text = "3.5", chuyển thành float, nhân 2, lưu vào ket_qua rồi in 7.0.',
+        check: "student_namespace.get('gia_text') == '3.5' and type(student_namespace.get('gia_tri')) is float and student_namespace.get('gia_tri') == 3.5 and student_namespace.get('ket_qua') == 7.0",
+        output: "7.0"
+      }
+    };
+
+    const exerciseParts = [
+      { id: "ex01", title: "Bài 01 · Biến trong Python" },
+      { id: "ex02", title: "Bài 02 · Chuyển đổi kiểu dữ liệu" },
+      { id: "ex03", title: "Bài 03 · Máy tính nhận input" }
+    ];
+    const selectedChallenges = exerciseParts.map((part) => {
+      const options = Object.entries(challenges).filter(([, challenge]) => challenge.part === part.id);
+      const selected = options[Math.floor(Math.random() * options.length)];
+      return { part, key: selected[0], challenge: selected[1] };
+    });
+    selectedChallenges.forEach(({ part, key, challenge }, index) => {
+      const card = document.createElement("article");
+      card.className = "coding-question";
+      const heading = document.createElement("h3");
+      heading.textContent = "Câu code ngẫu nhiên";
+      const title = document.createElement("strong");
+      title.className = "coding-title";
+      title.textContent = challenge.name;
+      const prompt = document.createElement("div");
+      prompt.className = "task-box";
+      prompt.textContent = challenge.prompt;
+      const editorLabel = document.createElement("label");
+      const editorId = `answer-${index + 1}`;
+      editorLabel.className = "editor-label";
+      editorLabel.htmlFor = editorId;
+      editorLabel.textContent = "Code của bạn";
+      const editor = document.createElement("textarea");
+      editor.id = editorId;
+      editor.className = "coding-editor";
+      editor.dataset.challenge = key;
+      editor.spellcheck = false;
+      editor.autocapitalize = "off";
+      editor.autocomplete = "off";
+      editor.setAttribute("aria-label", `Code trả lời tự luận ${index + 1}`);
+      const status = document.createElement("p");
+      status.className = "code-feedback";
+      status.setAttribute("aria-live", "polite");
+      card.append(heading, title, prompt, editorLabel, editor, status);
+      document.querySelector(`#answers-${part.id}`).append(card);
+    });
+
+    function updateProgress() {
+      const answered = quizQuestions.filter((question) => question.querySelector("input:checked")).length;
+      progressCopy.textContent = `Đã trả lời ${answered}/${totalQuestions}`;
+      progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
+      progressBar.setAttribute("aria-valuenow", answered);
+      quizQuestions.forEach((question, index) => {
+        const jumpButton = questionNav.children[index];
+        const isAnswered = Boolean(question.querySelector("input:checked"));
+        jumpButton.classList.toggle("answered", isAnswered);
+        jumpButton.setAttribute("aria-pressed", String(isAnswered));
+      });
+    }
+
+    quiz.addEventListener("change", updateProgress);
+
+    async function getPyodide() {
+      if (!pyodidePromise) {
+        pyodidePromise = new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.js";
+          script.onload = async () => {
+            try {
+              resolve(await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/" }));
+            } catch (error) {
+              reject(error);
+            }
+          };
+          script.onerror = () => reject(new Error("Không tải được Pyodide. Hãy kiểm tra kết nối internet rồi thử lại."));
+          document.head.append(script);
+        });
+      }
+      return pyodidePromise;
+    }
+
+    quiz.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      gradeButton.disabled = true;
+      gradeButton.textContent = "Đang chấm bài…";
+      codeStatus.textContent = "Đang chạy và chấm phần tự luận trong trình duyệt…";
+      codeStatus.className = "";
+      const questions = [...quiz.querySelectorAll("fieldset")];
+      let correctAnswers = 0;
+      let unanswered = 0;
+      feedback.replaceChildren();
+
+      questions.forEach((question, index) => {
+        const selected = question.querySelector("input:checked");
+        const correct = selected?.value === question.dataset.answer;
+        if (!selected) unanswered += 1;
+        if (correct) correctAnswers += 1;
+
+        const item = document.createElement("p");
+        item.className = `answer ${correct ? "correct" : "incorrect"}`;
+        const status = correct ? "Đúng" : selected ? "Chưa đúng" : "Chưa trả lời";
+        item.textContent = `${index + 1}. ${status}. ${question.dataset.explanation}`;
+        feedback.append(item);
+      });
+
+      const quizScore = correctAnswers / questions.length * 5;
+      let codingScore = 0;
+      let pyodide;
+      try {
+        pyodide = await getPyodide();
+      } catch (error) {
+        codeStatus.textContent = `${error.message} Phần tự luận được tính 0 điểm vì chưa chạy được Python.`;
+        codeStatus.className = "fail";
+      }
+
+      if (pyodide) {
+        const editors = [...codingQuestions.querySelectorAll(".coding-editor")];
+        for (const editor of editors) {
+          const challenge = challenges[editor.dataset.challenge];
+          const status = editor.nextElementSibling;
+          const code = editor.value.trim();
+          let passed = false;
+          let output = "";
+          if (code) {
+            try {
+              pyodide.setStdout({ batched: (line) => { output += line + "\n"; } });
+              pyodide.setStderr({ batched: (line) => { output += line + "\n"; } });
+              pyodide.globals.set("student_code", code);
+              pyodide.globals.set("input_values_json", JSON.stringify(challenge.inputs || []));
+              await pyodide.runPythonAsync(
+                "import builtins, json\nstudent_inputs = iter(json.loads(input_values_json))\nstudent_builtins = vars(builtins).copy()\nstudent_builtins['input'] = lambda prompt='': next(student_inputs)\nstudent_namespace = {'__builtins__': student_builtins}\nexec(student_code, student_namespace)"
+              );
+              pyodide.globals.set("check_expression", challenge.check);
+              passed = pyodide.runPython("eval(check_expression, {}, {'student_namespace': student_namespace})")
+                && output.trim() === challenge.output.replaceAll("\\n", "\n");
+            } catch (error) {
+              output = error.message || String(error);
+            }
+          }
+          if (passed) codingScore += 5 / editors.length;
+          status.textContent = `${passed ? "Đạt" : "Chưa đạt"}${output ? ` — Output: ${output.trim()}` : code ? " — Code gặp lỗi khi chạy." : " — Chưa nhập code."}`;
+          status.className = `code-feedback show ${passed ? "pass" : "fail"}`;
+        }
+        codeStatus.textContent = "Đã chấm xong phần tự luận.";
+        codeStatus.className = "pass";
+      }
+
+      const totalScore = quizScore + codingScore;
+      const formatScore = (score) => Number(score.toFixed(2)).toString();
+      quizScoreOutput.textContent = `${formatScore(quizScore)}/5`;
+      codingScoreOutput.textContent = `${formatScore(codingScore)}/5`;
+      totalScoreOutput.textContent = `${formatScore(totalScore)}/10`;
+      const passedCodeQuestions = [...codingQuestions.querySelectorAll(".code-feedback.pass")].length;
+      summary.textContent = `Trắc nghiệm: ${correctAnswers}/${questions.length} câu đúng${unanswered ? `, ${unanswered} câu bỏ trống` : ""}. Tự luận: ${passedCodeQuestions}/${selectedChallenges.length} câu đạt.`;
+      const codingFeedback = document.createElement("p");
+      codingFeedback.className = "answer";
+      codingFeedback.textContent = "Điểm tự luận dựa trên việc code chạy được, giá trị biến và output đúng yêu cầu.";
+      feedback.append(codingFeedback);
+      result.classList.add("show");
+      result.focus();
+      updateProgress();
+      gradeButton.disabled = false;
+      gradeButton.innerHTML = "Nộp bài &amp; xem điểm&nbsp; →";
+    });
+  </script>
+</body>
+</html>
+
